@@ -49,8 +49,9 @@ def upload():
             for file in latest_file:
                 file_name = os.path.basename(file)
                 file_names.append(os.path.splitext(file_name)[0]+os.path.splitext(file_name)[1])
-            file_selected = st.selectbox("Select file",file_names)
-            file_selected = file_path+file_selected
+            file_selected_1 = st.selectbox("Select file",file_names)
+            st.write(file_selected_1)
+            file_selected = file_path+file_selected_1
             if file_selected is not None:
                 if ".xlsx" in file_selected:
                     data_xls = pd.read_excel(f"{file_selected}", index_col=None)
