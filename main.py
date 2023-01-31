@@ -35,7 +35,7 @@ def upload():
             #     writer = csv.writer(file)
             data_xls = pd.read_csv(uploaded_file, index_col=None)
             # # st.dataframe(data_xls)
-            data_xls.to_csv('test_1_1.csv', index=False)
+            # data_xls.to_csv('test_1_1.csv', index=False)
             # st.write("uploaded!!!")
             # with open("test_1_1.csv", "r") as g:
             #     g.writelines(uploaded_file)
@@ -53,6 +53,7 @@ def upload():
             # with open("test_1_1.csv",encoding="utf-8") as f:
             #     f.write(uploaded_file)
             st.session_state['file_upload'] = True
+            return data_xls
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -131,7 +132,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 def operation_onchange():
     st.session_state['operation_'] = st.session_state.op
 
-def tab1():
+def tab1(df):
     # st.title("The title")
     # utf-8
     # with open('test_1_1', 'rb') as rawdata:
@@ -143,7 +144,7 @@ def tab1():
     # streamlit-example\test_1_1.csv
     # df = pd.read_csv(r'test_1_1.csv')
     # df = pd.read_csv('test_1_1.csv',index_col=None)
-    df = pd.read_csv("test_1_1.csv",encoding='iso8859_15')
+    # df = pd.read_csv("test_1_1.csv",encoding='iso8859_15')
     # drop where all nan row 
     df = df.dropna(how = 'all')
     # drop where all nan col 
@@ -656,13 +657,13 @@ def main():
     #     st.session_state['value_main'] = []
     # if 'operation' not in st.session_state:
     #     st.session_state['operation'] = []
-    upload()
+    df = upload()
     if st.session_state['file_upload']:
         # store current selected 
         st.success("File Selected successfully!!!")
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
         with tabs[0]:
-            st.dataframe(pd.read_csv('test_1_1.csv'))
+            st.dataframe(df)
         with tabs[1]:
             if 'column_main_' not in st.session_state:
                 st.session_state['column_main_'] = []
@@ -672,7 +673,7 @@ def main():
                 st.session_state['operation_'] = []
             if 'no_of_section' not in st.session_state:
                 st.session_state['no_of_section'] = 1
-            tab1()
+            tab1(df)
     else :
         st.error("👈Select file from sidebar....ERROR: File not Selected!")
 
