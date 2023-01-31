@@ -29,11 +29,20 @@ st.markdown("""
 }
 </style>""", unsafe_allow_html=True)
 
+def file_selector(folder_path='.'):
+    filenames = os.listdir(folder_path)
+    selected_filename = st.selectbox('Select a file', filenames)
+    return os.path.join(folder_path, selected_filename)
+
+
 def upload():
     with st.sidebar:
         # uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
         file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
+        
         if file_path:
+            filename = file_selector(folder_path=file_path)
+            st.write('You selected `%s`' % filename)
             # csv files in the path
             files = glob.glob(file_path + "/*.csv")
             files_xlsx = glob.glob(file_path + "/*.xlsx")
