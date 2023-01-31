@@ -1,0 +1,7 @@
+altair
+pandas
+streamlit
+pivottablejs
+streamlit-aggrid==0.2.3
+ipython
+# pip install -r requirements.txt 

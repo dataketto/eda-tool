@@ -1,0 +1,14 @@
+[theme]
+base="light"
+primaryColor="#414141"
+secondaryBackgroundColor="#e8e8e8"
+textColor="#181818"
+
+[server]
+# Max size, in megabytes, for files uploaded with the file_uploader.
+# Default: 200
+maxUploadSize = 100
+
+# Max size, in megabytes, of messages that can be sent via the WebSocket connection.
+# Default: 200
+maxMessageSize = 500
