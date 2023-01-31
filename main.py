@@ -49,6 +49,7 @@ def upload():
             for file in latest_file:
                 file_name = os.path.basename(file)
                 file_names.append(os.path.splitext(file_name)[0]+os.path.splitext(file_name)[1])
+            st.write(file_names)
             file_selected_1 = st.selectbox("Select file",file_names)
             st.write(file_selected_1)
             file_selected = file_path+file_selected_1
