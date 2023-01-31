@@ -47,6 +47,7 @@ def upload():
         for root, dirnames, filenames in os.walk(file_path):
             st.write(root)
             st.write(dirnames)
+            
             st.write(filenames)
         if file_path:
             filename = file_selector(folder_path=file_path)
