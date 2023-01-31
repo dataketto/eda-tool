@@ -3,6 +3,8 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
+import glob
+import os
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode,DataReturnMode, JsCode # pip install streamlit-aggrid==0.2.3
 # from st_aggrid import AgGrid
 from pandas.api.types import (
@@ -29,31 +31,38 @@ st.markdown("""
 
 def upload():
     with st.sidebar:
-        uploaded_file = st.sidebar.file_uploader("Choose a file",type=['csv'])
-        if uploaded_file is not None:
-            #  with open('students.csv', 'w', newline='') as file:
-            #     writer = csv.writer(file)
-            data_xls = pd.read_csv(uploaded_file, index_col=None)
-            # # st.dataframe(data_xls)
-            # data_xls.to_csv('test_1_1.csv', index=False)
-            # st.write("uploaded!!!")
-            # with open("test_1_1.csv", "r") as g:
-            #     g.writelines(uploaded_file)
-            # writing to csv file 
-            # with open(filename, 'w') as csvfile: 
-            #     # creating a csv writer object 
-            #     csvwriter = csv.writer(csvfile) 
-                    
-            #     # writing the fields 
-            #     csvwriter.writerow(fields) 
-                    
-            #     # writing the data rows 
-            #     csvwriter.writerows(rows)
-
-            # with open("test_1_1.csv",encoding="utf-8") as f:
-            #     f.write(uploaded_file)
-            st.session_state['file_upload'] = True
-            return data_xls
+        # uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
+        file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
+        if file_path:
+            # csv files in the path
+            files = glob.glob(file_path + "/*.csv")
+            files_xlsx = glob.glob(file_path + "/*.xlsx")
+            files_xml = glob.glob(file_path + "/*.xml")
+            for file in files_xlsx:
+                files.append(file)
+            for file in files_xml:
+                files.append(file)
+            latest_file = sorted(files, key=os.path.getctime)
+            # file name without extension
+            # file name with extension
+            file_names = []
+            for file in latest_file:
+                file_name = os.path.basename(file)
+                file_names.append(os.path.splitext(file_name)[0]+os.path.splitext(file_name)[1])
+            file_selected = st.selectbox("Select file",file_names)
+            file_selected = file_path+file_selected
+            if file_selected is not None:
+                if ".xlsx" in file_selected:
+                    data_xls = pd.read_excel(f"{file_selected}", index_col=None)
+                elif ".xml" in file_selected:
+                    data_xls = pd.read_xml(f"{file_selected}", index_col=None)
+                else:
+                    data_xls = pd.read_csv(f"{file_selected}", index_col=None)
+                st.session_state['file_upload'] = True
+                return data_xls
+        else :
+            st.session_state['file_upload'] = False
+    
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -133,75 +142,35 @@ def operation_onchange():
     st.session_state['operation_'] = st.session_state.op
 
 def tab1(df):
-    # st.title("The title")
-    # utf-8
-    # with open('test_1_1', 'rb') as rawdata:
-    #     result = chardet.detect(rawdata.read(100000))
-    # st.write(result)
-    # df = open('test_1_1',"r+", encoding="utf8")
-    # with open("test_1_1.csv", "r+") as fo:
-    #     file = fo.readline()
-    # streamlit-example\test_1_1.csv
-    # df = pd.read_csv(r'test_1_1.csv')
-    # df = pd.read_csv('test_1_1.csv',index_col=None)
-    # df = pd.read_csv("test_1_1.csv",encoding='iso8859_15')
     # drop where all nan row 
     df = df.dropna(how = 'all')
     # drop where all nan col 
     df = df.dropna(axis=1, how='all')
-    # df_2 = csv.reader('test_1_3.csv')
-    # df = pd.read_excel('test_1_1.xlsx')
-    # with open("test_1_1","wb") as f:
-    #     df = f.readlines()
-    # st.write(df)
-    # with open('test_1_1.csv', mode ='r')as file: 
-    #     # reading the CSV file 
-    #     csvFile = csv.reader(file) 
-    # print(df)
-    #     from pivottablejs import pivot_ui
-
-    # df = pd.read_csv("filename.csv", encoding='utf-8')
-    # df = df.select_dtypes(include=['object'])
-    # .str.replace('\W', '', regex=True)
-    # pivot_ui(df)
+    # clean up data
     df.replace('[^\x00-\x7F]','',regex=True, inplace = True)
-    # st.dataframe(df)
-    # st.write(len(df.select_dtypes(include=['object']).columns))
+    # \W for non-word character replace
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = df[col].str.replace('\W', '', regex=True)
-    # st.dataframe(df.dtypes)
-    # pd.to_numeric(df['Jan Units'], errors='coerce').fillna(0) 
-    # df.select_dtypes(include=numerics).columns.fillna(0)
-    # st.write((df[142:143]['campaigner_city'].str.replace('\W', '', regex=True)))
-    # getting error - 
-    # 'charmap' codec can't decode byte 0x81 in position 686081: character maps to <undefined>
+    # select purpose
     select_section = st.selectbox("select section",("Pivot table","EDA" ,"Final column selection"))
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    # remove duplicates
     duplicates_check_box = st.checkbox("Remove Duplicates")
-    
+
     #Example controlers
     st.sidebar.subheader("St-AgGrid example options")
-
     sample_size = 30
     grid_height = 800
-
     return_mode = st.sidebar.selectbox("Return Mode", list(DataReturnMode.__members__), index=1)
     return_mode_value = DataReturnMode.__members__[return_mode]
-
     update_mode = st.sidebar.selectbox("Update Mode", list(GridUpdateMode.__members__), index=len(GridUpdateMode.__members__)-1)
     update_mode_value = GridUpdateMode.__members__[update_mode]
-
     #enterprise modules
-    enable_enterprise_modules = st.sidebar.checkbox("Enable Enterprise Modules",value=True)
-    if enable_enterprise_modules:
-        enable_sidebar =st.sidebar.checkbox("Enable grid sidebar", value=True)
-    else:
-        enable_sidebar = False
-
+    enable_enterprise_modules = True
+    enable_sidebar =True
     #features
-    fit_columns_on_grid_load = st.sidebar.checkbox("Fit Grid Columns on Load")
-
-    enable_selection=st.sidebar.checkbox("Enable row selection", value=False)
+    fit_columns_on_grid_load = False
+    enable_selection=False
     if enable_selection:
         st.sidebar.subheader("Selection options")
         selection_mode = st.sidebar.radio("Selection Mode", ['single','multiple'], index=1)
@@ -217,61 +186,12 @@ def tab1(df):
                 suppressRowDeselection = st.sidebar.checkbox("Suppress deselection (while holding CTRL)", value=False)
             else:
                 suppressRowDeselection=False
-        st.sidebar.text("___")
-
-    enable_pagination = st.sidebar.checkbox("Enable pagination", value=True)
+    enable_pagination =True
     if enable_pagination:
-        st.sidebar.subheader("Pagination options")
-        paginationAutoSize = st.sidebar.checkbox("Auto pagination size", value=True)
+        paginationAutoSize =True
         if not paginationAutoSize:
             paginationPageSize = st.sidebar.number_input("Page size", value=5, min_value=0, max_value=sample_size)
-        st.sidebar.text("___")
 
-
-    #Infer basic colDefs from dataframe types
-    gb = GridOptionsBuilder.from_dataframe(df)
-    #customize gridOptions
-    gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
-    # gb.configure_column("date_only", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd', pivot=True)
-    # gb.configure_column("date_tz_aware", type=["dateColumnFilter","customDateTimeFormat"], custom_format_string='yyyy-MM-dd HH:mm zzz', pivot=True)
-
-    # gb.configure_column("apple", type=["numericColumn","numberColumnFilter","customNumericFormat"], precision=2, aggFunc='sum')
-    # gb.configure_column("banana", type=["numericColumn", "numberColumnFilter", "customNumericFormat"], precision=1, aggFunc='avg')
-    # gb.configure_column("chocolate", type=["numericColumn", "numberColumnFilter", "customCurrencyFormat"], custom_currency_symbol="R$", aggFunc='max')
-
-    #configures last row to use custom styles based on cell's value, injecting JsCode on components front end
-    cellsytle_jscode = JsCode("""
-    function(params) {
-        if (params.value == 'A') {
-            return {
-                'color': 'white',
-                'backgroundColor': 'darkred'
-            }
-        } else {
-            return {
-                'color': 'black',
-                'backgroundColor': 'white'
-            }
-        }
-    };
-    """)
-    gb.configure_column("group", cellStyle=cellsytle_jscode)
-
-    if enable_sidebar:
-        gb.configure_side_bar()
-
-    if enable_selection:
-        gb.configure_selection(selection_mode)
-        if use_checkbox:
-            gb.configure_selection(selection_mode, use_checkbox=True, groupSelectsChildren=groupSelectsChildren, groupSelectsFiltered=groupSelectsFiltered)
-        if ((selection_mode == 'multiple') & (not use_checkbox)):
-            gb.configure_selection(selection_mode, use_checkbox=False, rowMultiSelectWithClick=rowMultiSelectWithClick, suppressRowDeselection=suppressRowDeselection)
-
-    if enable_pagination:
-        if paginationAutoSize:
-            gb.configure_pagination(paginationAutoPageSize=True)
-        else:
-            gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=paginationPageSize)
 
     
 
@@ -285,7 +205,33 @@ def tab1(df):
             st.write("No Duplicates")
         else:
             st.success(f"{before_len-after_len} duplicates rows removed")
+        # st.write(before_len)
+        # st.write(after_len)
 
+    
+
+
+    nan_check_box = st.checkbox("Check Nulls")
+    if nan_check_box:
+        """###### Check Nulls"""
+        before_len = len(df)
+        # Applying the method
+        check_nan = df.isnull().values.any()
+        st.dataframe(df.isna().sum().sort_values(ascending=False))
+        nan_remove = st.checkbox("Remove Nulls ")
+        if nan_remove:
+            user_cat_i = st.multiselect(
+                        f"Values for ",
+                        df.columns[df.isna().any()].sort_values()
+                        # default=list(df.columns[df.isna().any()].sort_values()),
+                    )
+            for col in user_cat_i:
+                df = df.dropna(subset=col)
+            after_len = len(df)
+            if before_len-after_len==0:
+                st.write("No Rows Removed")
+            else:
+                st.success(f"{before_len-after_len} rows removed")
     filter_col_check_box = st.checkbox("Filter Columns")
     if filter_col_check_box:
         user_cat_i = st.multiselect(
@@ -294,23 +240,6 @@ def tab1(df):
                         default=list(df.columns),
                     )
         df = df[user_cat_i]
-    # 
-
-    nan_check_box = st.checkbox("Check Nulls")
-    if nan_check_box:
-        """###### Check Nulls"""
-        # Applying the method
-        check_nan = df.isnull().values.any()
-        st.dataframe(df.isna().sum().sort_values(ascending=False))
-        nan_remove = st.checkbox("Remove Nulls ")
-        if nan_remove:
-            user_cat_i = st.multiselect(
-                        f"Values for ",
-                        df.columns[df.isna().any()].sort_values(),
-                        default=list(df.columns[df.isna().any()].sort_values()),
-                    )
-            for col in user_cat_i:
-                df = df.dropna(subset=col)
 
     outlier_check_box = st.checkbox("Remove Outliers")
     if outlier_check_box:
@@ -343,6 +272,42 @@ def tab1(df):
             with open(t.src) as t:
                 components.html(t.read(), width=1800, height=800, scrolling=True)
         else :
+            #Infer basic colDefs from dataframe types
+            gb = GridOptionsBuilder.from_dataframe(df)
+            #customize gridOptions
+            gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+            #configures last row to use custom styles based on cell's value, injecting JsCode on components front end
+            cellsytle_jscode = JsCode("""
+            function(params) {
+                if (params.value == 'A') {
+                    return {
+                        'color': 'white',
+                        'backgroundColor': 'darkred'
+                    }
+                } else {
+                    return {
+                        'color': 'black',
+                        'backgroundColor': 'white'
+                    }
+                }
+            };
+            """)
+            gb.configure_column("group", cellStyle=cellsytle_jscode)
+
+            if enable_sidebar:
+                gb.configure_side_bar()
+            if enable_selection:
+                gb.configure_selection(selection_mode)
+                if use_checkbox:
+                    gb.configure_selection(selection_mode, use_checkbox=True, groupSelectsChildren=groupSelectsChildren, groupSelectsFiltered=groupSelectsFiltered)
+                if ((selection_mode == 'multiple') & (not use_checkbox)):
+                    gb.configure_selection(selection_mode, use_checkbox=False, rowMultiSelectWithClick=rowMultiSelectWithClick, suppressRowDeselection=suppressRowDeselection)
+            if enable_pagination:
+                if paginationAutoSize:
+                    gb.configure_pagination(paginationAutoPageSize=True)
+                else:
+                    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=paginationPageSize)
+
             gb.configure_grid_options(domLayout='normal')
             gridOptions = gb.build()
             grid_response = AgGrid(
@@ -367,6 +332,42 @@ def tab1(df):
             with open(t.src) as t:
                 components.html(t.read(), width=1800, height=800, scrolling=True)
         else :
+            #Infer basic colDefs from dataframe types
+            gb = GridOptionsBuilder.from_dataframe(df)
+            #customize gridOptions
+            gb.configure_default_column(groupable=True, value=True, enableRowGroup=True, aggFunc='sum', editable=True)
+            #configures last row to use custom styles based on cell's value, injecting JsCode on components front end
+            cellsytle_jscode = JsCode("""
+            function(params) {
+                if (params.value == 'A') {
+                    return {
+                        'color': 'white',
+                        'backgroundColor': 'darkred'
+                    }
+                } else {
+                    return {
+                        'color': 'black',
+                        'backgroundColor': 'white'
+                    }
+                }
+            };
+            """)
+            gb.configure_column("group", cellStyle=cellsytle_jscode)
+
+            if enable_sidebar:
+                gb.configure_side_bar()
+            if enable_selection:
+                gb.configure_selection(selection_mode)
+                if use_checkbox:
+                    gb.configure_selection(selection_mode, use_checkbox=True, groupSelectsChildren=groupSelectsChildren, groupSelectsFiltered=groupSelectsFiltered)
+                if ((selection_mode == 'multiple') & (not use_checkbox)):
+                    gb.configure_selection(selection_mode, use_checkbox=False, rowMultiSelectWithClick=rowMultiSelectWithClick, suppressRowDeselection=suppressRowDeselection)
+            if enable_pagination:
+                if paginationAutoSize:
+                    gb.configure_pagination(paginationAutoPageSize=True)
+                else:
+                    gb.configure_pagination(paginationAutoPageSize=False, paginationPageSize=paginationPageSize)
+
             gb.configure_grid_options(domLayout='normal')
             gridOptions = gb.build()
             grid_response = AgGrid(

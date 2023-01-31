@@ -4,4 +4,5 @@ streamlit
 pivottablejs
 streamlit-aggrid==0.2.3
 ipython
+openpyxl
 # pip install -r requirements.txt 
