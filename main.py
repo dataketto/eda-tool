@@ -39,7 +39,7 @@ def upload():
     with st.sidebar:
         # uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
         file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
-        
+        st.write(os.getcwd())
         if file_path:
             filename = file_selector(folder_path=file_path)
             st.write('You selected `%s`' % filename)
