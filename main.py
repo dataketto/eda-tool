@@ -5,6 +5,7 @@ import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
 import glob
 import os
+# from pathlib import Path
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode,DataReturnMode, JsCode # pip install streamlit-aggrid==0.2.3
 # from st_aggrid import AgGrid
 from pandas.api.types import (
@@ -34,6 +35,9 @@ def file_selector(folder_path='.'):
     selected_filename = st.selectbox('Select a file', filenames)
     return os.path.join(folder_path, selected_filename)
 
+
+
+# garret_burhenn_pitches_csv = Path(__file__).parents[1] / 'GarretBurhennData/Garret_Burhenn_Pitches.csv'
 
 def upload():
     with st.sidebar:
