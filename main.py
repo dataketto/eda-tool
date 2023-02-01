@@ -691,7 +691,7 @@ def main():
 
     upload_file = st.file_uploader("Choose File",type=['csv'])
     if upload_file:
-        df = pd.read_csv(upload_file, index_col=None)
+        df = pd.read_csv(upload_file, index_col=None,low_memory=False)
         # store current selected 
         st.success("File Selected successfully!!!")
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
