@@ -240,7 +240,7 @@ def tab1(df):
         df.drop_duplicates(keep=False, inplace=True)
         after_len = len(df)
         if before_len-after_len==0:
-            st.write("No Duplicates")
+            st.success("No Duplicates")
         else:
             st.success(f"{before_len-after_len} duplicates rows removed")
         # st.write(before_len)
@@ -264,7 +264,7 @@ def tab1(df):
                 df = df.dropna(subset=col)
             after_len = len(df)
             if before_len-after_len==0:
-                st.write("No Rows Removed")
+                st.success("No Rows Removed")
             else:
                 st.success(f"{before_len-after_len} rows removed")
     filter_col_check_box = st.checkbox("Filter Columns")
@@ -278,7 +278,7 @@ def tab1(df):
         df = df[user_cat_i]
         after_len = len(df.columns)
         if before_len-after_len==0:
-                st.write("No Columns Removed")
+                st.success("No Columns Removed")
         else:
             st.success(f"{before_len-after_len} Columns removed")
         
@@ -306,6 +306,9 @@ def tab1(df):
         else:
             st.success(f"{before_len-after_len} Outliers rows removed")
 
+    describe = st.button('Describe')
+    if describe:
+        st.dataframe(df.describe)
     # purpose
     if select_section == "Pivot table":
         """### Pivot table"""
@@ -492,13 +495,13 @@ def tab1(df):
             )
             st.altair_chart(chart, use_container_width=True)
 
-    csv = df.to_csv().encode('utf-8')
-    st.download_button(
-        label="Download data as CSV",
-        data=csv,
-        file_name='streamlit.csv',
-        mime='text/csv',
-    )
+    # csv = df.to_csv().encode('utf-8')
+    # st.download_button(
+    #     label="Download data as CSV",
+    #     data=csv,
+    #     file_name='streamlit.csv',
+    #     mime='text/csv',
+    # )
      
 
             # base = alt.Chart(df).encode(
@@ -711,6 +714,8 @@ def main():
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
         with tabs[0]:
             st.dataframe(df)
+            """ ### Describe """
+            st.dataframe(df.describe)
         with tabs[1]:
             if 'column_main_' not in st.session_state:
                 st.session_state['column_main_'] = []
