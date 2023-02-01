@@ -45,22 +45,27 @@ def upload():
         uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
         file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
         st.write(os.getcwd())
+        filenames = os.listdir(file_path)
+        st.write(filenames)
         # for root, dirnames, filenames in os.walk('.', topdown=True):
         #     st.write(root)
         #     st.write(dirnames)
         #     st.write(filenames)
 
         # Save uploaded file to 'F:/tmp' folder.
-        save_folder = 'D:/Adownload'
-        save_path = Path(save_folder, uploaded_file.name)
-        st.write(save_path)
-        with open(save_path, mode='wb') as w:
-            w.write(uploaded_file.getvalue())
-
-        if save_path.exists():
-            st.success(f'File {File.name} is successfully saved!')
+        # save_folder = 'D:/Adownload'
+        # save_path = Path(save_folder, uploaded_file.name)
+        # st.write(save_path)
+        # with open(save_path, mode='wb') as w:
+        #     w.write(uploaded_file.getvalue())
+        # if save_path.exists():
+        #     st.success(f'File {File.name} is successfully saved!')
         if file_path:
-            filename = file_selector(folder_path=file_path)
+            # Save uploaded file to 'F:/tmp' folder.
+            save_folder = 'D:/Adownload'
+            save_path = Path(save_folder, uploaded_file.name)
+            st.write(save_path)
+            filename = file_selector(folder_path=save_path)
             st.write('You selected `%s`' % filename)
             # csv files in the path
             files = glob.glob(file_path + "/*.csv")
