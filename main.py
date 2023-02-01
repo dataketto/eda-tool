@@ -18,7 +18,7 @@ from pandas.api.types import (
     is_object_dtype,
 )
 
-st.set_page_config(page_title="Cool App",page_icon=":shark:",layout="wide")
+st.set_page_config(page_title="EDA App",page_icon=":shark:",layout="wide")
 st.markdown("""
 <style>
 [data-testid="column"] column:first-child {
