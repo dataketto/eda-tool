@@ -306,7 +306,7 @@ def tab1(df):
         else:
             st.success(f"{before_len-after_len} Outliers rows removed")
 
-    describe = st.button('Describe')
+    describe = st.checkbox('Describe')
     if describe:
         st.dataframe(df.describe())
     # purpose
