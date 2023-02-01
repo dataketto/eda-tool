@@ -269,12 +269,19 @@ def tab1(df):
                 st.success(f"{before_len-after_len} rows removed")
     filter_col_check_box = st.checkbox("Filter Columns")
     if filter_col_check_box:
+        before_len = len(df.columns)
         user_cat_i = st.multiselect(
                         f"Values for ",
                         df.columns,
                         default=list(df.columns),
                     )
         df = df[user_cat_i]
+        after_len = len(df.columns)
+        if before_len-after_len==0:
+                st.write("No Columns Removed")
+        else:
+            st.success(f"{before_len-after_len} Columns removed")
+        
 
     outlier_check_box = st.checkbox("Remove Outliers")
     if outlier_check_box:
@@ -282,15 +289,15 @@ def tab1(df):
         before_len = len(df)
         col1,col2 = st.columns(2)
         select_outlier_col = col1.multiselect(
-                            f"Select Outlier column ",
-                            df.select_dtypes(include=numerics).columns,
-                            default=list(df.select_dtypes(include=numerics).columns),
+                            f"Select Outlier Column ",
+                            df.select_dtypes(include=numerics).columns
+                            # default=list(df.select_dtypes(include=numerics).columns),
                         )
         outlier_slider = col2.slider('Select a Interquartile Range',0.00, 1.00,step=0.05,value= (0.25, 0.75))
         Q1 = df.quantile(outlier_slider[0])
         Q3 = df.quantile(outlier_slider[1]) 
         IQR = Q3 - Q1
-        st.dataframe(IQR)
+        # st.dataframe(IQR)
         #Identify outliers #Identify outliers (values outside of Q1-1.5IQR to Q3+1.5IQR range) 
         df = df[~((df[select_outlier_col] < (Q1 - 1.5 * IQR)) |(df[select_outlier_col] > (Q3 + 1.5 * IQR))).any(axis=1)]
         after_len = len(df)
@@ -303,6 +310,7 @@ def tab1(df):
     if select_section == "Pivot table":
         """### Pivot table"""
         if len(df)<=200000:
+            st.info('Drag and Drop columns in horizontal and vertical box. Change Table and Count accordingly', icon="ℹ️")
             t = pivot_ui(df)
             with open(t.src) as t:
                 components.html(t.read(), width=1800, height=800, scrolling=True)
