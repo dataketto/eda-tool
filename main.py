@@ -3,9 +3,11 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
-import glob
-from pathlib import Path
-import os
+# import glob
+# from pathlib import Path
+# import os
+
+
 # from pathlib import Path
 from st_aggrid import GridOptionsBuilder, AgGrid, GridUpdateMode,DataReturnMode, JsCode # pip install streamlit-aggrid==0.2.3
 # from st_aggrid import AgGrid
@@ -31,73 +33,73 @@ st.markdown("""
 }
 </style>""", unsafe_allow_html=True)
 
-def file_selector(folder_path='.'):
-    filenames = os.listdir(folder_path)
-    selected_filename = st.selectbox('Select a file', filenames)
-    return os.path.join(folder_path, selected_filename)
+# def file_selector(folder_path='.'):
+#     filenames = os.listdir(folder_path)
+#     selected_filename = st.selectbox('Select a file', filenames)
+#     return os.path.join(folder_path, selected_filename)
 
 
 
 # garret_burhenn_pitches_csv = Path(__file__).parents[1] / 'GarretBurhennData/Garret_Burhenn_Pitches.csv'
 
-def upload():
-    with st.sidebar:
-        uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
-        file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
-        st.write(os.getcwd())
-        filenames = os.listdir(file_path)
-        st.write(filenames)
-        # for root, dirnames, filenames in os.walk('.', topdown=True):
-        #     st.write(root)
-        #     st.write(dirnames)
-        #     st.write(filenames)
+# def upload():
+#     with st.sidebar:
+#         uploaded_file = st.sidebar.file_uploader("Choose a Foldr",type=['csv'])
+#         file_path = st.text_input("Paste a Folder Path (e.g. D:\Download\ ) ")
+#         st.write(os.getcwd())
+#         filenames = os.listdir(file_path)
+#         st.write(filenames)
+#         # for root, dirnames, filenames in os.walk('.', topdown=True):
+#         #     st.write(root)
+#         #     st.write(dirnames)
+#         #     st.write(filenames)
 
-        # Save uploaded file to 'F:/tmp' folder.
-        # save_folder = 'D:/Adownload'
-        # save_path = Path(save_folder, uploaded_file.name)
-        # st.write(save_path)
-        # with open(save_path, mode='wb') as w:
-        #     w.write(uploaded_file.getvalue())
-        # if save_path.exists():
-        #     st.success(f'File {File.name} is successfully saved!')
-        if file_path:
-            # Save uploaded file to 'F:/tmp' folder.
-            save_folder = 'D:/Adownload'
-            save_path = Path(save_folder, uploaded_file.name)
-            st.write(save_path)
-            filename = file_selector(folder_path=save_path)
-            st.write('You selected `%s`' % filename)
-            # csv files in the path
-            files = glob.glob(file_path + "/*.csv")
-            files_xlsx = glob.glob(file_path + "/*.xlsx")
-            files_xml = glob.glob(file_path + "/*.xml")
-            for file in files_xlsx:
-                files.append(file)
-            for file in files_xml:
-                files.append(file)
-            latest_file = sorted(files, key=os.path.getctime)
-            # file name without extension
-            # file name with extension
-            file_names = []
-            for file in latest_file:
-                file_name = os.path.basename(file)
-                file_names.append(os.path.splitext(file_name)[0]+os.path.splitext(file_name)[1])
-            st.write(file_names)
-            # file_selected_1 = st.selectbox("Select file",file_names)
-            # st.write(file_selected_1)
-            # file_selected = file_path+file_selected_1
-            file_selected = st.text_input("Paste a Folder Path  D:\Download\ ) ")
-            if file_selected is not None:
-                if ".xlsx" in file_selected:
-                    data_xls = pd.read_excel(f"{file_selected}", index_col=None)
-                elif ".xml" in file_selected:
-                    data_xls = pd.read_xml(f"{file_selected}", index_col=None)
-                else:
-                    data_xls = pd.read_csv(f"{file_selected}", index_col=None)
-                st.session_state['file_upload'] = True
-                return data_xls
-        else :
-            st.session_state['file_upload'] = False
+#         # Save uploaded file to 'F:/tmp' folder.
+#         # save_folder = 'D:/Adownload'
+#         # save_path = Path(save_folder, uploaded_file.name)
+#         # st.write(save_path)
+#         # with open(save_path, mode='wb') as w:
+#         #     w.write(uploaded_file.getvalue())
+#         # if save_path.exists():
+#         #     st.success(f'File {File.name} is successfully saved!')
+#         if file_path:
+#             # Save uploaded file to 'F:/tmp' folder.
+#             save_folder = 'D:/Adownload'
+#             save_path = Path(save_folder, uploaded_file.name)
+#             st.write(save_path)
+#             filename = file_selector(folder_path=save_path)
+#             st.write('You selected `%s`' % filename)
+#             # csv files in the path
+#             files = glob.glob(file_path + "/*.csv")
+#             files_xlsx = glob.glob(file_path + "/*.xlsx")
+#             files_xml = glob.glob(file_path + "/*.xml")
+#             for file in files_xlsx:
+#                 files.append(file)
+#             for file in files_xml:
+#                 files.append(file)
+#             latest_file = sorted(files, key=os.path.getctime)
+#             # file name without extension
+#             # file name with extension
+#             file_names = []
+#             for file in latest_file:
+#                 file_name = os.path.basename(file)
+#                 file_names.append(os.path.splitext(file_name)[0]+os.path.splitext(file_name)[1])
+#             st.write(file_names)
+#             # file_selected_1 = st.selectbox("Select file",file_names)
+#             # st.write(file_selected_1)
+#             # file_selected = file_path+file_selected_1
+#             file_selected = st.text_input("Paste a Folder Path  D:\Download\ ) ")
+#             if file_selected is not None:
+#                 if ".xlsx" in file_selected:
+#                     data_xls = pd.read_excel(f"{file_selected}", index_col=None)
+#                 elif ".xml" in file_selected:
+#                     data_xls = pd.read_xml(f"{file_selected}", index_col=None)
+#                 else:
+#                     data_xls = pd.read_csv(f"{file_selected}", index_col=None)
+#                 st.session_state['file_upload'] = True
+#                 return data_xls
+#         else :
+#             st.session_state['file_upload'] = False
     
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
@@ -194,12 +196,15 @@ def tab1(df):
     duplicates_check_box = st.checkbox("Remove Duplicates")
 
     #Example controlers
-    st.sidebar.subheader("St-AgGrid example options")
+    # st.sidebar.subheader("St-AgGrid example options")
     sample_size = 30
     grid_height = 800
-    return_mode = st.sidebar.selectbox("Return Mode", list(DataReturnMode.__members__), index=1)
+    # st.write(list(DataReturnMode.__members__)[0])
+    # return_mode = st.sidebar.selectbox("Return Mode", list(DataReturnMode.__members__), index=1)
+    return_mode = list(DataReturnMode.__members__)[0]
     return_mode_value = DataReturnMode.__members__[return_mode]
-    update_mode = st.sidebar.selectbox("Update Mode", list(GridUpdateMode.__members__), index=len(GridUpdateMode.__members__)-1)
+    # update_mode = st.sidebar.selectbox("Update Mode", list(GridUpdateMode.__members__), index=len(GridUpdateMode.__members__)-1)
+    update_mode = list(GridUpdateMode.__members__)[-1]
     update_mode_value = GridUpdateMode.__members__[update_mode]
     #enterprise modules
     enable_enterprise_modules = True
@@ -228,9 +233,6 @@ def tab1(df):
         if not paginationAutoSize:
             paginationPageSize = st.sidebar.number_input("Page size", value=5, min_value=0, max_value=sample_size)
 
-
-    
-
     if duplicates_check_box:
         """###### Duplicates"""\
         # dropping duplicate values
@@ -243,9 +245,6 @@ def tab1(df):
             st.success(f"{before_len-after_len} duplicates rows removed")
         # st.write(before_len)
         # st.write(after_len)
-
-    
-
 
     nan_check_box = st.checkbox("Check Nulls")
     if nan_check_box:
@@ -288,7 +287,7 @@ def tab1(df):
                             default=list(df.select_dtypes(include=numerics).columns),
                         )
         outlier_slider = col2.slider('Select a Interquartile Range',0.00, 1.00,step=0.05,value= (0.25, 0.75))
-        Q1 = df.quantile(outlier_slider[0]) 
+        Q1 = df.quantile(outlier_slider[0])
         Q3 = df.quantile(outlier_slider[1]) 
         IQR = Q3 - Q1
         st.dataframe(IQR)
@@ -485,7 +484,14 @@ def tab1(df):
             )
             st.altair_chart(chart, use_container_width=True)
 
-            
+    csv = df.to_csv().encode('utf-8')
+    st.download_button(
+        label="Download data as CSV",
+        data=csv,
+        file_name='streamlit.csv',
+        mime='text/csv',
+    )
+     
 
             # base = alt.Chart(df).encode(
             #     theta=alt.Theta("column_X:Q", stack=True),
@@ -493,7 +499,7 @@ def tab1(df):
             #     color="column_X:N",
             # )
             # st.altair_chart(base, use_container_width=True)
-    submit = st.button('Final Select')
+    # submit = st.button('Final Select')
         
     # t = pivot_ui(df)
     # with open(t.src) as t:
