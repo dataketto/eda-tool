@@ -190,7 +190,7 @@ def tab1(df):
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = df[col].str.replace('\W', '', regex=True)
     # select purpose
-    select_section = st.selectbox("select section",("Pivot table","EDA" ,"Final column selection"))
+    select_section = st.selectbox("select section",("Pivot table","EDA" ))
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     # remove duplicates
     duplicates_check_box = st.checkbox("Remove Duplicates")
@@ -316,7 +316,7 @@ def tab1(df):
             st.info('Drag and Drop columns in horizontal and vertical box. Change Table and Count accordingly', icon="ℹ️")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=1800, height=800, scrolling=True)
+                components.html(t.read(), width=1800, height=1000, scrolling=True)
         else :
             #Infer basic colDefs from dataframe types
             gb = GridOptionsBuilder.from_dataframe(df)
@@ -376,7 +376,7 @@ def tab1(df):
         if len(df)<=80000:
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=1800, height=800, scrolling=True)
+                components.html(t.read(), width=1800, height=1000, scrolling=True)
         else :
             #Infer basic colDefs from dataframe types
             gb = GridOptionsBuilder.from_dataframe(df)
