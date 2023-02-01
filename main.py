@@ -308,7 +308,7 @@ def tab1(df):
 
     describe = st.button('Describe')
     if describe:
-        st.dataframe(df.describe)
+        st.dataframe(df.describe())
     # purpose
     if select_section == "Pivot table":
         """### Pivot table"""
@@ -715,7 +715,7 @@ def main():
         with tabs[0]:
             st.dataframe(df)
             """ ### Describe """
-            st.dataframe(df.describe)
+            st.dataframe(df.describe())
         with tabs[1]:
             if 'column_main_' not in st.session_state:
                 st.session_state['column_main_'] = []
