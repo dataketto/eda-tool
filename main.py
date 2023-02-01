@@ -697,16 +697,16 @@ def main():
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
         with tabs[0]:
             st.dataframe(df)
-        with tabs[1]:
-            if 'column_main_' not in st.session_state:
-                st.session_state['column_main_'] = []
-            if 'value_main_' not in st.session_state:
-                st.session_state['value_main_'] = []
-            if 'operation_' not in st.session_state:
-                st.session_state['operation_'] = []
-            if 'no_of_section' not in st.session_state:
-                st.session_state['no_of_section'] = 1
-            tab1(df)
+        # with tabs[1]:
+        #     if 'column_main_' not in st.session_state:
+        #         st.session_state['column_main_'] = []
+        #     if 'value_main_' not in st.session_state:
+        #         st.session_state['value_main_'] = []
+        #     if 'operation_' not in st.session_state:
+        #         st.session_state['operation_'] = []
+        #     if 'no_of_section' not in st.session_state:
+        #         st.session_state['no_of_section'] = 1
+        #     tab1(df)
     else :
         st.error("👆 Select file!!")
 
