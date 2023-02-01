@@ -688,14 +688,10 @@ def main():
         st.session_state['file_upload'] = False
     if 'tab_1' not in st.session_state:
         st.session_state['tab_1'] = 2
-    # if 'column_main' not in st.session_state:
-    #     st.session_state['column_main'] = []
-    # if 'value_main' not in st.session_state:
-    #     st.session_state['value_main'] = []
-    # if 'operation' not in st.session_state:
-    #     st.session_state['operation'] = []
-    df = upload()
-    if st.session_state['file_upload']:
+
+    upload_file = st.file_uploader("Choose File",type=['csv'])
+    if upload_file:
+        df = pd.read_csv(upload_file, index_col=None)
         # store current selected 
         st.success("File Selected successfully!!!")
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
@@ -712,7 +708,7 @@ def main():
                 st.session_state['no_of_section'] = 1
             tab1(df)
     else :
-        st.error("👈Select file from sidebar....ERROR: File not Selected!")
+        st.error("👆 Select file!!")
 
 
 if __name__ == "__main__":
