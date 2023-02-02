@@ -21,6 +21,13 @@ from pandas.api.types import (
 st.set_page_config(page_title="EDA App",page_icon=":shark:",layout="wide")
 st.markdown("""
 <style>
+footer {visibility: hidden;}
+.reportview-container .main .block-container{{
+        padding-top: 0 rem;
+        padding-right: 0 rem;
+        padding-left: 0 rem;
+        padding-bottom: 0 rem;
+        }}
 [data-testid="column"] column:first-child {
     box-shadow: rgb(0 0 0 / 20%) 0px 2px 1px -1px, rgb(0 0 0 / 14%) 0px 1px 1px 0px, rgb(0 0 0 / 12%) 0px 1px 3px 0px;
     border-radius: 15px;
@@ -115,7 +122,7 @@ def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     if not modify:
         return df
 
-    df = df.copy()
+    # df = df.copy()
 
     # Try to convert datetimes into a standard format (datetime, no timezone)
     for col in df.columns:
@@ -190,7 +197,7 @@ def tab1(df):
     for col in df.select_dtypes(include=['object']).columns:
         df[col] = df[col].str.replace('\W', '', regex=True)
     # select purpose
-    select_section = st.selectbox("select section",("Pivot table","EDA" ))
+    select_section = st.selectbox("Select Purpose",("Pivot table","EDA" ))
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     # remove duplicates
     duplicates_check_box = st.checkbox("Remove Duplicates")
@@ -237,7 +244,7 @@ def tab1(df):
         """###### Duplicates"""\
         # dropping duplicate values
         before_len = len(df)
-        df.drop_duplicates(keep=False, inplace=True)
+        df.drop_duplicates(keep='first', inplace=True)
         after_len = len(df)
         if before_len-after_len==0:
             st.success("No Duplicates")
@@ -276,6 +283,7 @@ def tab1(df):
                         default=list(df.columns),
                     )
         df = df[user_cat_i]
+        # df = filter_dataframe(df)
         after_len = len(df.columns)
         if before_len-after_len==0:
                 st.success("No Columns Removed")
@@ -297,12 +305,16 @@ def tab1(df):
         Q1 = df.quantile(outlier_slider[0])
         Q3 = df.quantile(outlier_slider[1]) 
         IQR = Q3 - Q1
+        # st.dataframe(Q3)
+        # st.dataframe(Q1)
         # st.dataframe(IQR)
+        # st.dataframe(Q1 - 1.5 * IQR)
+        # st.dataframe(Q3 + 1.5 * IQR)
         #Identify outliers #Identify outliers (values outside of Q1-1.5IQR to Q3+1.5IQR range) 
-        df = df[~((df[select_outlier_col] < (Q1 - 1.5 * IQR)) |(df[select_outlier_col] > (Q3 + 1.5 * IQR))).any(axis=1)]
+        df = df[~((df[select_outlier_col] < (Q1)) |(df[select_outlier_col] > (Q3))).any(axis=1)]
         after_len = len(df)
         if before_len-after_len==0:
-                st.write("No Outliers Removed")
+                st.success("No Outliers Removed")
         else:
             st.success(f"{before_len-after_len} Outliers rows removed")
 
@@ -312,11 +324,12 @@ def tab1(df):
     # purpose
     if select_section == "Pivot table":
         """### Pivot table"""
-        if len(df)<=200000:
-            st.info('Drag and Drop columns in horizontal and vertical box. Change Table and Count accordingly', icon="ℹ️")
+        if len(df)<=500000:
+            st.info('Drag and Drop columns in horizontal and vertical box. Change Render Option (Current Selected- Table) and Values Option (Current Selected- Count) accordingly', icon="ℹ️")
+            st.info("Using the 'TSV Export' Renderer, you can copy from this textarea straight into Excel.", icon="ℹ️")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=1800, height=1000, scrolling=True)
+                components.html(t.read(), height=1000, scrolling=True)
         else :
             #Infer basic colDefs from dataframe types
             gb = GridOptionsBuilder.from_dataframe(df)
@@ -373,10 +386,12 @@ def tab1(df):
             
     elif select_section== "EDA" :
         """### EDA"""
-        if len(df)<=80000:
+        if len(df)<=500000:
+            st.info('Drag and Drop columns in horizontal and vertical box. Change Render Option (Current Selected- Table) and Values Option (Current Selected- Count) accordingly', icon="ℹ️")
+            st.info("Using the 'TSV Export' Renderer, you can copy from this textarea straight into Excel.", icon="ℹ️")
             t = pivot_ui(df)
             with open(t.src) as t:
-                components.html(t.read(), width=1800, height=1000, scrolling=True)
+                components.html(t.read(),height=1000, scrolling=True)
         else :
             #Infer basic colDefs from dataframe types
             gb = GridOptionsBuilder.from_dataframe(df)
@@ -706,9 +721,12 @@ def main():
     if 'tab_1' not in st.session_state:
         st.session_state['tab_1'] = 2
 
-    upload_file = st.file_uploader("Choose File",type=['csv'])
+    upload_file = st.file_uploader("Choose File",type=['csv','xlsx'])
     if upload_file:
-        df = pd.read_csv(upload_file, index_col=None,low_memory=False)
+        if ".xlsx" in upload_file.name:
+            df = pd.read_excel(upload_file, index_col=None)
+        else:
+            df = pd.read_csv(upload_file, index_col=None,low_memory=False)
         # store current selected 
         st.success("File Selected successfully!!!")
         tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
