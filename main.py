@@ -3,6 +3,8 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
+import pandas_profiling
+from streamlit_pandas_profiling import st_profile_report
 # import glob
 # from pathlib import Path
 # import os
@@ -108,6 +110,9 @@ footer {visibility: hidden;}
 #         else :
 #             st.session_state['file_upload'] = False
     
+@st.cache(allow_output_mutation=True)
+def gen_profile_report(df, *report_args, **report_kwargs):
+    return df.profile_report(*report_args, **report_kwargs)
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -321,6 +326,7 @@ def tab1(df):
     describe = st.checkbox('Describe')
     if describe:
         st.dataframe(df.describe())
+
     # purpose
     if select_section == "Pivot table":
         """### Pivot table"""
@@ -475,6 +481,32 @@ def tab1(df):
             # ).interactive()
             # st.altair_chart(boxplot, use_container_width=True)
 
+            chart_data = df[[column_X,column_Y]]
+            # scatter_m =  alt.Chart(chart_data).mark_circle().encode(
+            #     alt.X(alt.repeat("column"), type='quantitative'),
+            #     alt.Y(alt.repeat("row"), type='quantitative'),
+            #     color='Origin:N'
+            # ).properties(
+            #     width=150,
+            #     height=150
+            # ).repeat(
+            #     row= column_X,
+            #     column=column_Y
+            # ).interactive()
+            scatter_m = alt.Chart(chart_data).mark_area().encode(
+                x=alt.X(column_X),
+                y=alt.Y(
+                    f"column_Y:Q",aggregate="sum"
+                    # title='Population',
+                    # axis=alt.Axis(format='~s')
+                ),
+                facet=alt.Facet('year:O', columns=5),
+            ).properties(
+                title='US Age Distribution By Year',
+                width=90,
+                height=80
+            )
+            st.altair_chart(scatter_m, use_container_width=True)
             # bar
             col1,col2,col3,col4 = st.columns(4)
             column_X_ = col1.selectbox("X _ ",df.columns)
@@ -509,7 +541,8 @@ def tab1(df):
                 chart.encode(color='column_Y_:N').properties(title='nominal'),
             )
             st.altair_chart(chart, use_container_width=True)
-
+    st.session_state['report_status'] = False
+    return df
     # csv = df.to_csv().encode('utf-8')
     # st.download_button(
     #     label="Download data as CSV",
@@ -718,8 +751,8 @@ def main():
     # Storing the chat session state
     if 'file_upload' not in st.session_state:
         st.session_state['file_upload'] = False
-    if 'tab_1' not in st.session_state:
-        st.session_state['tab_1'] = 2
+    if 'report_status' not in st.session_state:
+        st.session_state['report_status'] = False
 
     upload_file = st.file_uploader("Choose File",type=['csv','xlsx'])
     if upload_file:
@@ -729,7 +762,7 @@ def main():
             df = pd.read_csv(upload_file, index_col=None,low_memory=False)
         # store current selected 
         st.success("File Selected successfully!!!")
-        tabs = st.tabs(["🗃 Data Preview", "📈 Analysis"])
+        tabs = st.tabs(["🗃 DATA PREVIEW", "📈 ANALYSIS","📝 REPORT"])
         with tabs[0]:
             st.dataframe(df)
             """ ### Describe """
@@ -743,7 +776,16 @@ def main():
                 st.session_state['operation_'] = []
             if 'no_of_section' not in st.session_state:
                 st.session_state['no_of_section'] = 1
-            tab1(df)
+            df = tab1(df)
+        with tabs[2]:
+            generate_report = st.button("Generate")
+            if generate_report:
+                st.session_state['report_status'] = True
+            if st.session_state['report_status'] :
+                p_report = gen_profile_report(df, explorative=True)
+                # with st.expander("REPORT", expanded=True):
+                st_profile_report(p_report)
+
     else :
         st.error("👆 Select file!!")
 
