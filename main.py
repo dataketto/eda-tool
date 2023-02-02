@@ -3,7 +3,6 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
-import pandas_profiling
 from streamlit_pandas_profiling import st_profile_report
 # import glob
 # from pathlib import Path
