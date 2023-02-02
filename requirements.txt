@@ -5,4 +5,5 @@ pivottablejs
 streamlit-aggrid==0.2.3
 ipython
 streamlit-pandas-profiling
+ydata_profiling
 # pip install -r requirements.txt 

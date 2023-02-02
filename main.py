@@ -3,6 +3,7 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from pivottablejs import pivot_ui
+from ydata_profiling import ProfileReport
 from streamlit_pandas_profiling import st_profile_report
 # import glob
 # from pathlib import Path
@@ -111,7 +112,10 @@ footer {visibility: hidden;}
     
 @st.cache(allow_output_mutation=True)
 def gen_profile_report(df, *report_args, **report_kwargs):
-    return df.profile_report(*report_args, **report_kwargs)
+    if len(df)<=50000:
+        return ProfileReport(df,explorative=True,correlations={"auto": {"calculate": True}},samples=None, missing_diagrams=None)
+    else:
+        return ProfileReport(df, minimal=True)
 
 def filter_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """
