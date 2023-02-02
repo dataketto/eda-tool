@@ -466,7 +466,7 @@ def tab1(df):
             except Exception as e: st.write(e)
 
             # Boxplot with Min/Max Whiskers
-            boxplot  = alt.Chart(df).mark_boxplot(extent='min-max').encode(
+            boxplot  = alt.Chart(chart_data).mark_boxplot(extent='min-max').encode(
                 x=alt.X(column_X),
                 y=alt.Y(column_Y)
             ).properties(
