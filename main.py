@@ -466,14 +466,14 @@ def tab1(df):
             except Exception as e: st.write(e)
 
             # Boxplot with Min/Max Whiskers
-            boxplot  = alt.Chart(chart_data).mark_boxplot(extent='min-max').encode(
-                x=alt.X(column_X),
-                y=alt.Y(column_Y)
-            ).properties(
-                width=150,
-                height=400
-            ).interactive()
-            st.altair_chart(boxplot, use_container_width=True)
+            # boxplot  = alt.Chart(chart_data).mark_boxplot(extent='min-max').encode(
+            #     x=alt.X(column_X),
+            #     y=alt.Y(column_Y)
+            # ).properties(
+            #     width=150,
+            #     height=400
+            # ).interactive()
+            # st.altair_chart(boxplot, use_container_width=True)
 
             # bar
             col1,col2,col3,col4 = st.columns(4)
