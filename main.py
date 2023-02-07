@@ -781,6 +781,7 @@ def main():
                 st.session_state['no_of_section'] = 1
             df = tab1(df)
         with tabs[2]:
+            st.info("All changes from Analysis are applied here")
             generate_report = st.button("Generate")
             if generate_report:
                 st.session_state['report_status'] = True
