@@ -202,8 +202,8 @@ def tab1(df):
     # clean up data
     df.replace('[^\x00-\x7F]','',regex=True, inplace = True)
     # \W for non-word character replace
-    for col in df.select_dtypes(include=['object']).columns:
-        df[col] = df[col].str.replace('\W', '', regex=True)
+    # for col in df.select_dtypes(include=['object']).columns:
+    #     df[col] = df[col].str.replace('\W', '', regex=True)
     # select purpose
     select_section = st.selectbox("Select Purpose",("Pivot table","EDA" ))
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
@@ -211,7 +211,7 @@ def tab1(df):
     #Example controlers
     # st.sidebar.subheader("St-AgGrid example options")
     sample_size = 30
-    grid_height = 800
+    grid_height = 1000
     # st.write(list(DataReturnMode.__members__)[0])
     # return_mode = st.sidebar.selectbox("Return Mode", list(DataReturnMode.__members__), index=1)
     return_mode = list(DataReturnMode.__members__)[0]
@@ -245,6 +245,7 @@ def tab1(df):
         paginationAutoSize =True
         if not paginationAutoSize:
             paginationPageSize = st.sidebar.number_input("Page size", value=5, min_value=0, max_value=sample_size)
+
     #filter columns
     filter_col_check_box = st.checkbox("Filter Columns")
     if filter_col_check_box:
@@ -255,12 +256,13 @@ def tab1(df):
                         default=list(df.columns),
                     )
         df = df[user_cat_i]
-        # df = filter_dataframe(df)
         after_len = len(df.columns)
         if before_len-after_len==0:
                 st.success("No Columns Removed")
         else:
             st.success(f"{before_len-after_len} Columns removed")
+            
+    df = filter_dataframe(df)
     # remove duplicates
     duplicates_check_box = st.checkbox("Remove Duplicates")
     if duplicates_check_box:
