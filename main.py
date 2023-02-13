@@ -207,8 +207,6 @@ def tab1(df):
     # select purpose
     select_section = st.selectbox("Select Purpose",("Pivot table","EDA" ))
     numerics = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-    # remove duplicates
-    duplicates_check_box = st.checkbox("Remove Duplicates")
 
     #Example controlers
     # st.sidebar.subheader("St-AgGrid example options")
@@ -247,7 +245,24 @@ def tab1(df):
         paginationAutoSize =True
         if not paginationAutoSize:
             paginationPageSize = st.sidebar.number_input("Page size", value=5, min_value=0, max_value=sample_size)
-
+    #filter columns
+    filter_col_check_box = st.checkbox("Filter Columns")
+    if filter_col_check_box:
+        before_len = len(df.columns)
+        user_cat_i = st.multiselect(
+                        f"Values for ",
+                        df.columns,
+                        default=list(df.columns),
+                    )
+        df = df[user_cat_i]
+        # df = filter_dataframe(df)
+        after_len = len(df.columns)
+        if before_len-after_len==0:
+                st.success("No Columns Removed")
+        else:
+            st.success(f"{before_len-after_len} Columns removed")
+    # remove duplicates
+    duplicates_check_box = st.checkbox("Remove Duplicates")
     if duplicates_check_box:
         """###### Duplicates"""\
         # dropping duplicate values
@@ -282,21 +297,7 @@ def tab1(df):
                 st.success("No Rows Removed")
             else:
                 st.success(f"{before_len-after_len} rows removed")
-    filter_col_check_box = st.checkbox("Filter Columns")
-    if filter_col_check_box:
-        before_len = len(df.columns)
-        user_cat_i = st.multiselect(
-                        f"Values for ",
-                        df.columns,
-                        default=list(df.columns),
-                    )
-        df = df[user_cat_i]
-        # df = filter_dataframe(df)
-        after_len = len(df.columns)
-        if before_len-after_len==0:
-                st.success("No Columns Removed")
-        else:
-            st.success(f"{before_len-after_len} Columns removed")
+    
         
 
     outlier_check_box = st.checkbox("Remove Outliers")
